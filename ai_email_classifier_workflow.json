@@ -1,0 +1,407 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        0
+      ],
+      "id": "61ea5304-92b4-454b-9dd0-2c6c009660b5",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "AIzaSyBkV0hGNnw7DewP9aI_2tYpUwcrQ_JNup4"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"You are an email classifier.\\n\\nTask: Classify the email into exactly ONE of these labels:\\n- sales\\n- support\\n- complaint\\n- spam\\n- other\\n\\nRules:\\n- Return ONLY the label word.\\n- No JSON.\\n- No explanation.\\n- No punctuation.\\n- Lowercase only.\\n\\nEmail subject: {{$json.subject}}\\nEmail body: {{$json.body}}\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        16,
+        0
+      ],
+      "id": "71678882-bf3c-4b73-97ba-d890e8ade464",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "78c85d68-3fb9-4145-8c7b-935bbe15ecbd",
+              "name": "subject",
+              "value": "pricing",
+              "type": "string"
+            },
+            {
+              "id": "a67de754-eb02-4b86-b42f-6653d85b322d",
+              "name": "from",
+              "value": "customer@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "a2420367-2bf9-4bff-a892-9297efd3277f",
+              "name": "body",
+              "value": "  Hi I want to know your pricing plans.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "0a688d84-7255-4e66-8bfd-a3b0a1386ea5",
+      "name": "fake email"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.candidates[0].content.parts[0].text.trim().toLowerCase()}}",
+                    "rightValue": "support",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6e2e1011-f732-445d-b3bc-0235e9a595d2"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b7ec7b9d-49bc-4743-b23b-40eb3db376cc",
+                    "leftValue": "={{$json.candidates[0].content.parts[0].text.trim().toLowerCase()}}",
+                    "rightValue": "sales",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "728516ad-dab7-4b09-a2ab-776c4aeab035",
+                    "leftValue": "={{$json.candidates[0].content.parts[0].text.trim().toLowerCase()}}",
+                    "rightValue": "complaint",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a5094e09-33db-4c08-b10d-69bb471519fc",
+                    "leftValue": "={{$json.candidates[0].content.parts[0].text.trim().toLowerCase()}}",
+                    "rightValue": "spam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2cddb1ad-34ef-4621-a8a7-806803aef4b6",
+                    "leftValue": "={{$json.candidates[0].content.parts[0].text.trim().toLowerCase()}}",
+                    "rightValue": "other",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "fb24957a-d118-4277-ab6c-65a8bb9ee5e2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AJPDK89PD",
+          "mode": "list",
+          "cachedResultName": "support"
+        },
+        "text": "=New email classified by AI  Subject: {{$json.subject}}  Body: {{$json.body}}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        608,
+        -224
+      ],
+      "id": "8551ac2f-80de-4909-857d-874148f50b0c",
+      "name": "Send a message",
+      "webhookId": "f66537dc-b652-44d8-a6a5-60bf73a031fa",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "Awe5tl0wF64QDtel",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AJEBVHRPZ",
+          "mode": "list",
+          "cachedResultName": "sales"
+        },
+        "text": "=New email classified by AI  Subject: {{$json.subject}}  Body: {{$json.body}}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        608,
+        -48
+      ],
+      "id": "242eab12-231d-4473-a567-8bb7719b83de",
+      "name": "Send a message1",
+      "webhookId": "183bf98b-65d1-40ac-b4ca-94bf23b43f96",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "Awe5tl0wF64QDtel",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AJPDMHDQT",
+          "mode": "list",
+          "cachedResultName": "complaints"
+        },
+        "text": "=New email classified by AI  Subject: {{$json.subject}}  Body: {{$json.body}}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        608,
+        128
+      ],
+      "id": "1a20c072-93f9-4b5b-b4d0-bb96119f280e",
+      "name": "Send a message2",
+      "webhookId": "fb77b56a-7dce-4e39-ab4e-6af0ed389f46",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "Awe5tl0wF64QDtel",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AJVR3PNFL",
+          "mode": "list",
+          "cachedResultName": "spam"
+        },
+        "text": "=New email classified by AI  Subject: {{$json.subject}}  Body: {{$json.body}}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        592,
+        272
+      ],
+      "id": "682b15f9-080b-4e32-87d1-18a5aafda61f",
+      "name": "Send a message3",
+      "webhookId": "7018c0ae-21f5-45f3-b331-1f6f89304df6",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "Awe5tl0wF64QDtel",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "fake email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "fake email": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "63f41cd9-e613-4cf5-afbf-a39aa8744c95",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "77f5b6dd4d7fa4d84a8494f4ee9bcf141a5072f490121d52157e6aa1576e3456"
+  },
+  "id": "iibLHl7FDa1PQc0S",
+  "tags": []
+}
